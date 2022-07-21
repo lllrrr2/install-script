@@ -214,11 +214,11 @@ depend_install() {
     ${package_manager} update -y
   fi
   ${package_manager} install -y \
-  curl \
-  wget \
-  tar \
-  lsof \
-  systemd
+    curl \
+    wget \
+    tar \
+    lsof \
+    systemd
 }
 
 # 安装BBRPlus 仅支持CentOS系统
@@ -290,8 +290,8 @@ install_docker() {
     if [[ ${can_google} == 0 ]]; then
       sh <(curl -sL https://get.docker.com) --mirror Aliyun
       # 设置Docker国内源
-      mkdir -p /etc/docker && \
-      cat >/etc/docker/daemon.json <<EOF
+      mkdir -p /etc/docker &&
+        cat >/etc/docker/daemon.json <<EOF
 {
  "registry-mirrors":[${DOCKER_MIRROR}]
 }
@@ -300,9 +300,9 @@ EOF
       sh <(curl -sL https://get.docker.com)
     fi
 
-    systemctl enable docker && \
-    systemctl restart docker && \
-    docker network create trojan-panel-network
+    systemctl enable docker &&
+      systemctl restart docker &&
+      docker network create trojan-panel-network
 
     if [[ $(docker -v 2>/dev/null) ]]; then
       echo_content skyBlue "---> Docker安装完成"
@@ -323,8 +323,8 @@ install_caddy_tls() {
   if [[ -z $(docker ps -q -f "name=^trojan-panel-caddy$") ]]; then
     echo_content green "---> 安装Caddy TLS"
 
-    wget --no-check-certificate -O ${CADDY_DATA}html.tar.gz ${STATIC_HTML} && \
-    tar -zxvf ${CADDY_DATA}html.tar.gz -C ${CADDY_SRV}
+    wget --no-check-certificate -O ${CADDY_DATA}html.tar.gz ${STATIC_HTML} &&
+      tar -zxvf ${CADDY_DATA}html.tar.gz -C ${CADDY_SRV}
 
     read -r -p "请输入Caddy的转发端口(用于申请证书,默认:8863): " caddy_remote_port
     [[ -z "${caddy_remote_port}" ]] && caddy_remote_port=8863
@@ -415,15 +415,15 @@ EOF
       kill -9 "$(lsof -i:80,443 -t)"
     fi
 
-    docker pull teddysun/caddy:1.0.5 && \
-    docker run -d --name trojan-panel-caddy --restart always \
-    --network=trojan-panel-network \
-    -p 80:80 \
-    -p ${caddy_remote_port}:${caddy_remote_port} \
-    -v ${CADDY_Caddyfile}:"/etc/caddy/Caddyfile" \
-    -v ${CADDY_ACME}:"/root/.caddy/acme/acme-v02.api.letsencrypt.org/sites/" \
-    -v ${CADDY_SRV}:${CADDY_SRV} \
-    teddysun/caddy:1.0.5
+    docker pull teddysun/caddy:1.0.5 &&
+      docker run -d --name trojan-panel-caddy --restart always \
+        --network=trojan-panel-network \
+        -p 80:80 \
+        -p ${caddy_remote_port}:${caddy_remote_port} \
+        -v ${CADDY_Caddyfile}:"/etc/caddy/Caddyfile" \
+        -v ${CADDY_ACME}:"/root/.caddy/acme/acme-v02.api.letsencrypt.org/sites/" \
+        -v ${CADDY_SRV}:${CADDY_SRV} \
+        teddysun/caddy:1.0.5
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-caddy$") ]]; then
       cat >${DOMAIN_FILE} <<EOF
@@ -458,27 +458,27 @@ install_mariadb() {
     done
 
     if [[ "${mariadb_user}" == "root" ]]; then
-      docker pull mariadb:10.7.3 && \
-      docker run -d --name trojan-panel-mariadb --restart always \
-      --network=trojan-panel-network \
-      -p ${mariadb_port}:3306 \
-      -v ${MARIA_DATA}:/var/lib/mysql \
-      -e MYSQL_DATABASE="trojan_panel_db" \
-      -e MYSQL_ROOT_PASSWORD="${mariadb_pas}" \
-      -e TZ=Asia/Shanghai \
-      mariadb:10.7.3
+      docker pull mariadb:10.7.3 &&
+        docker run -d --name trojan-panel-mariadb --restart always \
+          --network=trojan-panel-network \
+          -p ${mariadb_port}:3306 \
+          -v ${MARIA_DATA}:/var/lib/mysql \
+          -e MYSQL_DATABASE="trojan_panel_db" \
+          -e MYSQL_ROOT_PASSWORD="${mariadb_pas}" \
+          -e TZ=Asia/Shanghai \
+          mariadb:10.7.3
     else
-      docker pull mariadb:10.7.3 && \
-      docker run -d --name trojan-panel-mariadb --restart always \
-      --network=trojan-panel-network \
-      -p ${mariadb_port}:3306 \
-      -v ${MARIA_DATA}:/var/lib/mysql \
-      -e MYSQL_DATABASE="trojan_panel_db" \
-      -e MYSQL_ROOT_PASSWORD="${mariadb_pas}" \
-      -e MYSQL_USER="${mariadb_user}" \
-      -e MYSQL_PASSWORD="${mariadb_pas}" \
-      -e TZ=Asia/Shanghai \
-      mariadb:10.7.3
+      docker pull mariadb:10.7.3 &&
+        docker run -d --name trojan-panel-mariadb --restart always \
+          --network=trojan-panel-network \
+          -p ${mariadb_port}:3306 \
+          -v ${MARIA_DATA}:/var/lib/mysql \
+          -e MYSQL_DATABASE="trojan_panel_db" \
+          -e MYSQL_ROOT_PASSWORD="${mariadb_pas}" \
+          -e MYSQL_USER="${mariadb_user}" \
+          -e MYSQL_PASSWORD="${mariadb_pas}" \
+          -e TZ=Asia/Shanghai \
+          mariadb:10.7.3
     fi
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-mariadb$") ]]; then
@@ -511,12 +511,12 @@ install_redis() {
       fi
     done
 
-    docker pull redis:6.2.7 && \
-    docker run -d --name trojan-panel-redis --restart always \
-    --network=trojan-panel-network \
-    -p ${redis_port}:6379 \
-    -v ${REDIS_DATA}:/data redis:6.2.7 \
-    redis-server --requirepass "${redis_pass}"
+    docker pull redis:6.2.7 &&
+      docker run -d --name trojan-panel-redis --restart always \
+        --network=trojan-panel-network \
+        -p ${redis_port}:6379 \
+        -v ${REDIS_DATA}:/data redis:6.2.7 \
+        redis-server --requirepass "${redis_pass}"
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-redis$") ]]; then
       echo_content skyBlue "---> Redis安装完成"
@@ -550,11 +550,11 @@ install_trojan_panel() {
     done
 
     if [[ "${mariadb_ip}" == "trojan-panel-mariadb" ]]; then
-      docker exec trojan-panel-mariadb mysql -p"${mariadb_pas}" -e "drop database trojan_panel_db;" && \
-      docker exec trojan-panel-mariadb mysql -p"${mariadb_pas}" -e "create database trojan_panel_db;"
+      docker exec trojan-panel-mariadb mysql -p"${mariadb_pas}" -e "drop database trojan_panel_db;" &&
+        docker exec trojan-panel-mariadb mysql -p"${mariadb_pas}" -e "create database trojan_panel_db;"
     else
-      docker exec trojan-panel-mariadb mysql -h"${mariadb_ip}" -P"${mariadb_port}" -u"${mariadb_user}" -p"${mariadb_pas}" -e "drop database trojan_panel_db;" &>/dev/null && \
-      docker exec trojan-panel-mariadb mysql -h"${mariadb_ip}" -P"${mariadb_port}" -u"${mariadb_user}" -p"${mariadb_pas}" -e "create database trojan_panel_db;" &>/dev/null
+      docker exec trojan-panel-mariadb mysql -h"${mariadb_ip}" -P"${mariadb_port}" -u"${mariadb_user}" -p"${mariadb_pas}" -e "drop database trojan_panel_db;" &>/dev/null &&
+        docker exec trojan-panel-mariadb mysql -h"${mariadb_ip}" -P"${mariadb_port}" -u"${mariadb_user}" -p"${mariadb_pas}" -e "create database trojan_panel_db;" &>/dev/null
     fi
 
     read -r -p "请输入Redis的IP地址(默认:本机Redis): " redis_host
@@ -575,21 +575,21 @@ install_trojan_panel() {
       docker exec trojan-panel-redis redis-cli -h "${redis_host}" -p ${redis_port} -a "${redis_pass}" -e "flushall" &>/dev/null
     fi
 
-    docker pull jonssonyan/trojan-panel && \
-    docker run -d --name trojan-panel --restart always \
-    --network=trojan-panel-network \
-    -p 8081:8081 \
-    -v ${CADDY_SRV}:${TROJAN_PANEL_WEBFILE} \
-    -v ${TROJAN_PANEL_LOGS}:${TROJAN_PANEL_LOGS} \
-    -v /etc/localtime:/etc/localtime \
-    -e "mariadb_ip=${mariadb_ip}" \
-    -e "mariadb_port=${mariadb_port}" \
-    -e "mariadb_user=${mariadb_user}" \
-    -e "mariadb_pas=${mariadb_pas}" \
-    -e "redis_host=${redis_host}" \
-    -e "redis_port=${redis_port}" \
-    -e "redis_pass=${redis_pass}" \
-    jonssonyan/trojan-panel
+    docker pull jonssonyan/trojan-panel &&
+      docker run -d --name trojan-panel --restart always \
+        --network=trojan-panel-network \
+        -p 8081:8081 \
+        -v ${CADDY_SRV}:${TROJAN_PANEL_WEBFILE} \
+        -v ${TROJAN_PANEL_LOGS}:${TROJAN_PANEL_LOGS} \
+        -v /etc/localtime:/etc/localtime \
+        -e "mariadb_ip=${mariadb_ip}" \
+        -e "mariadb_port=${mariadb_port}" \
+        -e "mariadb_user=${mariadb_user}" \
+        -e "mariadb_pas=${mariadb_pas}" \
+        -e "redis_host=${redis_host}" \
+        -e "redis_port=${redis_port}" \
+        -e "redis_pass=${redis_pass}" \
+        jonssonyan/trojan-panel
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel$") ]]; then
       echo_content skyBlue "---> Trojan Panel后端安装完成"
@@ -646,13 +646,13 @@ server {
 }
 EOF
 
-    docker pull jonssonyan/trojan-panel-ui && \
-    docker run -d --name trojan-panel-ui --restart always \
-    --network=trojan-panel-network \
-    -p 8888:80 \
-    -v ${NGINX_CONFIG}:/etc/nginx/conf.d/default.conf \
-    -v ${CADDY_ACME}"${domain}":${CADDY_ACME}"${domain}" \
-    jonssonyan/trojan-panel-ui
+    docker pull jonssonyan/trojan-panel-ui &&
+      docker run -d --name trojan-panel-ui --restart always \
+        --network=trojan-panel-network \
+        -p 8888:80 \
+        -v ${NGINX_CONFIG}:/etc/nginx/conf.d/default.conf \
+        -v ${CADDY_ACME}"${domain}":${CADDY_ACME}"${domain}" \
+        jonssonyan/trojan-panel-ui
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-ui$") ]]; then
       echo_content skyBlue "---> Trojan Panel前端安装完成"
@@ -746,13 +746,13 @@ installTrojanGFW() {
 }
 EOF
 
-    docker pull trojangfw/trojan && \
-    docker run -d --name trojan-panel-trojanGFW --restart always \
-    --network=trojan-panel-network \
-    -p ${trojanGFW_port}:${trojanGFW_port} \
-    -v ${TROJANGFW_CONFIG}:"/config/config.json" \
-    -v ${CADDY_ACME}:${CADDY_ACME} \
-    trojangfw/trojan
+    docker pull trojangfw/trojan &&
+      docker run -d --name trojan-panel-trojanGFW --restart always \
+        --network=trojan-panel-network \
+        -p ${trojanGFW_port}:${trojanGFW_port} \
+        -v ${TROJANGFW_CONFIG}:"/config/config.json" \
+        -v ${CADDY_ACME}:${CADDY_ACME} \
+        trojangfw/trojan
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGFW$") ]]; then
       echo_content skyBlue "---> TrojanGFW 数据库版 安装完成"
@@ -839,13 +839,13 @@ installTrojanGFWStandalone() {
 }
 EOF
 
-    docker pull trojangfw/trojan && \
-    docker run -d --name trojan-panel-trojanGFW-standalone --restart always \
-    --network=trojan-panel-network \
-    -p ${trojanGFW_port}:${trojanGFW_port} \
-    -v ${TROJANGFW_STANDALONE_CONFIG}:"/config/config.json" \
-    -v ${CADDY_ACME}:${CADDY_ACME} \
-    trojangfw/trojan
+    docker pull trojangfw/trojan &&
+      docker run -d --name trojan-panel-trojanGFW-standalone --restart always \
+        --network=trojan-panel-network \
+        -p ${trojanGFW_port}:${trojanGFW_port} \
+        -v ${TROJANGFW_STANDALONE_CONFIG}:"/config/config.json" \
+        -v ${CADDY_ACME}:${CADDY_ACME} \
+        trojangfw/trojan
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGFW-standalone$") ]]; then
       echo_content skyBlue "---> TrojanGFW 单机版 安装完成"
@@ -1018,13 +1018,13 @@ install_trojanGO() {
 }
 EOF
 
-    docker pull p4gefau1t/trojan-go && \
-    docker run -d --name trojan-panel-trojanGO --restart=always \
-    --network=trojan-panel-network \
-    -p ${trojanGO_port}:${trojanGO_port} \
-    -v ${TROJANGO_CONFIG}:"/etc/trojan-go/config.json" \
-    -v ${CADDY_ACME}:${CADDY_ACME} \
-    p4gefau1t/trojan-go
+    docker pull p4gefau1t/trojan-go &&
+      docker run -d --name trojan-panel-trojanGO --restart=always \
+        --network=trojan-panel-network \
+        -p ${trojanGO_port}:${trojanGO_port} \
+        -v ${TROJANGO_CONFIG}:"/etc/trojan-go/config.json" \
+        -v ${CADDY_ACME}:${CADDY_ACME} \
+        p4gefau1t/trojan-go
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGO$") ]]; then
       echo_content skyBlue "---> TrojanGO 数据库版 安装完成"
@@ -1201,13 +1201,13 @@ install_trojanGO_standalone() {
 }
 EOF
 
-    docker pull p4gefau1t/trojan-go && \
-    docker run -d --name trojan-panel-trojanGO-standalone --restart=always \
-    --network=trojan-panel-network \
-    -p ${trojanGO_port}:${trojanGO_port} \
-    -v ${TROJANGO_STANDALONE_CONFIG}:"/etc/trojan-go/config.json" \
-    -v ${CADDY_ACME}:${CADDY_ACME} \
-    p4gefau1t/trojan-go
+    docker pull p4gefau1t/trojan-go &&
+      docker run -d --name trojan-panel-trojanGO-standalone --restart=always \
+        --network=trojan-panel-network \
+        -p ${trojanGO_port}:${trojanGO_port} \
+        -v ${TROJANGO_STANDALONE_CONFIG}:"/etc/trojan-go/config.json" \
+        -v ${CADDY_ACME}:${CADDY_ACME} \
+        p4gefau1t/trojan-go
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGO-standalone$") ]]; then
       echo_content skyBlue "---> TrojanGO 单机版 安装完成"
@@ -1281,14 +1281,14 @@ install_hysteria() {
 }
 EOF
 
-    docker pull tobyxdd/hysteria && \
-    docker run -d --name trojan-panel-hysteria --restart=always \
-    --network=trojan-panel-network \
-    -p ${hysteria_port}:${hysteria_port}/udp \
-    -p 8801:8801 \
-    -v ${HYSTERIA_CONFIG}:/etc/hysteria.json \
-    -v ${CADDY_ACME}:${CADDY_ACME} \
-    tobyxdd/hysteria -c /etc/hysteria.json server
+    docker pull tobyxdd/hysteria &&
+      docker run -d --name trojan-panel-hysteria --restart=always \
+        --network=trojan-panel-network \
+        -p ${hysteria_port}:${hysteria_port}/udp \
+        -p 8801:8801 \
+        -v ${HYSTERIA_CONFIG}:/etc/hysteria.json \
+        -v ${CADDY_ACME}:${CADDY_ACME} \
+        tobyxdd/hysteria -c /etc/hysteria.json server
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-hysteria$") ]]; then
       echo_content skyBlue "---> Hysteria 数据版 安装完成"
@@ -1354,13 +1354,13 @@ install_hysteria_standalone() {
 }
 EOF
 
-    docker pull tobyxdd/hysteria && \
-    docker run -d --name trojan-panel-hysteria-standalone --restart=always \
-    --network=trojan-panel-network \
-    -p ${hysteria_port}:${hysteria_port}/udp \
-    -v ${HYSTERIA_STANDALONE_CONFIG}:/etc/hysteria.json \
-    -v ${CADDY_ACME}:${CADDY_ACME} \
-    tobyxdd/hysteria -c /etc/hysteria.json server
+    docker pull tobyxdd/hysteria &&
+      docker run -d --name trojan-panel-hysteria-standalone --restart=always \
+        --network=trojan-panel-network \
+        -p ${hysteria_port}:${hysteria_port}/udp \
+        -v ${HYSTERIA_STANDALONE_CONFIG}:/etc/hysteria.json \
+        -v ${CADDY_ACME}:${CADDY_ACME} \
+        tobyxdd/hysteria -c /etc/hysteria.json server
 
     if [[ -n $(docker ps -q -f "name=^trojan-panel-hysteria-standalone$") ]]; then
       echo_content skyBlue "---> Hysteria 单机版 安装完成"
@@ -1430,29 +1430,29 @@ update_trojan_panel() {
     docker exec trojan-panel-redis redis-cli -h "${redis_host}" -p ${redis_port} -a "${redis_pass}" -e "flushall" &>/dev/null
   fi
 
-  docker rm -f trojan-panel && \
-  docker rmi -f jonssonyan/trojan-panel && \
-  rm -rf ${TROJAN_PANEL_DATA}*
+  docker rm -f trojan-panel &&
+    docker rmi -f jonssonyan/trojan-panel &&
+    rm -rf ${TROJAN_PANEL_DATA}
 
-  docker rm -f trojan-panel-ui && \
-  docker rmi -f jonssonyan/trojan-panel-ui && \
-  rm -rf ${TROJAN_PANEL_UI_DATA}*
+  docker rm -f trojan-panel-ui &&
+    docker rmi -f jonssonyan/trojan-panel-ui &&
+    rm -rf ${TROJAN_PANEL_UI_DATA}
 
-  docker pull jonssonyan/trojan-panel && \
-  docker run -d --name trojan-panel --restart always \
-  --network=trojan-panel-network \
-  -p 8081:8081 \
-  -v ${CADDY_SRV}:${TROJAN_PANEL_WEBFILE} \
-  -v ${TROJAN_PANEL_LOGS}:${TROJAN_PANEL_LOGS} \
-  -v /etc/localtime:/etc/localtime \
-  -e "mariadb_ip=${mariadb_ip}" \
-  -e "mariadb_port=${mariadb_port}" \
-  -e "mariadb_user=${mariadb_user}" \
-  -e "mariadb_pas=${mariadb_pas}" \
-  -e "redis_host=${redis_host}" \
-  -e "redis_port=${redis_port}" \
-  -e "redis_pass=${redis_pass}" \
-  jonssonyan/trojan-panel
+  docker pull jonssonyan/trojan-panel &&
+    docker run -d --name trojan-panel --restart always \
+      --network=trojan-panel-network \
+      -p 8081:8081 \
+      -v ${CADDY_SRV}:${TROJAN_PANEL_WEBFILE} \
+      -v ${TROJAN_PANEL_LOGS}:${TROJAN_PANEL_LOGS} \
+      -v /etc/localtime:/etc/localtime \
+      -e "mariadb_ip=${mariadb_ip}" \
+      -e "mariadb_port=${mariadb_port}" \
+      -e "mariadb_user=${mariadb_user}" \
+      -e "mariadb_pas=${mariadb_pas}" \
+      -e "redis_host=${redis_host}" \
+      -e "redis_port=${redis_port}" \
+      -e "redis_pass=${redis_pass}" \
+      jonssonyan/trojan-panel
 
   if [[ "$?" == "0" ]]; then
     echo_content skyBlue "---> Trojan Panel更新完成"
@@ -1460,13 +1460,13 @@ update_trojan_panel() {
     echo_content red "---> Trojan Panel更新失败"
   fi
 
-  docker pull jonssonyan/trojan-panel-ui && \
-  docker run -d --name trojan-panel-ui --restart always \
-  --network=trojan-panel-network \
-  -p 8888:80 \
-  -v ${NGINX_CONFIG}:/etc/nginx/conf.d/default.conf \
-  -v ${CADDY_ACME}"${domain}":${CADDY_ACME}"${domain}" \
-  jonssonyan/trojan-panel-ui
+  docker pull jonssonyan/trojan-panel-ui &&
+    docker run -d --name trojan-panel-ui --restart always \
+      --network=trojan-panel-network \
+      -p 8888:80 \
+      -v ${NGINX_CONFIG}:/etc/nginx/conf.d/default.conf \
+      -v ${CADDY_ACME}"${domain}":${CADDY_ACME}"${domain}" \
+      jonssonyan/trojan-panel-ui
 
   if [[ "$?" == "0" ]]; then
     echo_content skyBlue "---> Trojan Panel UI更新完成"
@@ -1481,12 +1481,8 @@ uninstall_caddy_tls() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel-caddy$") ]]; then
     echo_content green "---> 卸载Caddy TLS"
 
-    docker rm -f trojan-panel-caddy && \
-    rm -rf ${CADDY_DATA}
-
-    if [[ -d "/root/.caddy" ]]; then
-      rm -rf  /root/.caddy
-    fi
+    docker rm -f trojan-panel-caddy &&
+      rm -rf ${CADDY_DATA}
 
     echo_content skyBlue "---> Caddy TLS卸载完成"
   else
@@ -1495,13 +1491,13 @@ uninstall_caddy_tls() {
 }
 
 # 卸载MariaDB
-uninstall_mariadb(){
+uninstall_mariadb() {
   # 判断MariaDB是否安装
   if [[ -n $(docker ps -q -f "name=^trojan-panel-mariadb$") ]]; then
     echo_content green "---> 卸载MariaDB"
 
-    docker rm -f trojan-panel-mariadb && \
-    rm -rf ${MARIA_DATA}
+    docker rm -f trojan-panel-mariadb &&
+      rm -rf ${MARIA_DATA}
 
     echo_content skyBlue "---> MariaDB卸载完成"
   else
@@ -1510,13 +1506,13 @@ uninstall_mariadb(){
 }
 
 # 卸载Redis
-uninstall_redis(){
+uninstall_redis() {
   # 判断Redis是否安装
   if [[ -n $(docker ps -q -f "name=^trojan-panel-redis$") ]]; then
     echo_content green "---> 卸载Redis"
 
-    docker rm -f trojan-panel-redis && \
-    rm -rf ${REDIS_DATA}
+    docker rm -f trojan-panel-redis &&
+      rm -rf ${REDIS_DATA}
 
     echo_content skyBlue "---> Redis卸载完成"
   else
@@ -1530,14 +1526,14 @@ uninstall_trojan_panel() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel$") ]]; then
     echo_content green "---> 卸载Trojan Panel"
 
-    docker rm -f trojan-panel && \
-    docker rmi -f jonssonyan/trojan-panel && \
-    rm -rf ${TROJAN_PANEL_DATA}
+    docker rm -f trojan-panel &&
+      docker rmi -f jonssonyan/trojan-panel &&
+      rm -rf ${TROJAN_PANEL_DATA}
 
-    docker rm -f trojan-panel-ui && \
-    docker rmi -f jonssonyan/trojan-panel-ui && \
-    rm -rf ${TROJAN_PANEL_UI_DATA} && \
-    rm -rf ${NGINX_DATA}
+    docker rm -f trojan-panel-ui &&
+      docker rmi -f jonssonyan/trojan-panel-ui &&
+      rm -rf ${TROJAN_PANEL_UI_DATA} &&
+      rm -rf ${NGINX_DATA}
 
     echo_content skyBlue "---> Trojan Panel卸载完成"
   else
@@ -1550,9 +1546,9 @@ uninstallTrojanGFW() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGFW$") ]]; then
     echo_content green "---> 卸载TrojanGFW+Caddy+Web+TLS节点 数据库版"
 
-    docker rm -f trojan-panel-trojanGFW && \
-    docker rmi trojangfw/trojan && \
-    rm -f ${TROJANGFW_CONFIG}
+    docker rm -f trojan-panel-trojanGFW &&
+      docker rmi -f trojangfw/trojan &&
+      rm -f ${TROJANGFW_CONFIG}
 
     echo_content skyBlue "---> TrojanGFW+Caddy+Web+TLS节点 数据库版卸载完成"
   else
@@ -1565,9 +1561,9 @@ uninstallTrojanGFWStandalone() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGFW-standalone$") ]]; then
     echo_content green "---> 卸载TrojanGFW+Caddy+Web+TLS节点 单机版"
 
-    docker rm -f trojan-panel-trojanGFW-standalone && \
-    docker rmi trojangfw/trojan && \
-    rm -f ${TROJANGFW_STANDALONE_CONFIG}
+    docker rm -f trojan-panel-trojanGFW-standalone &&
+      docker rmi -f trojangfw/trojan &&
+      rm -f ${TROJANGFW_STANDALONE_CONFIG}
 
     echo_content skyBlue "---> TrojanGFW+Caddy+Web+TLS节点 单机版卸载完成"
   else
@@ -1580,9 +1576,9 @@ uninstall_trojanGO() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGO$") ]]; then
     echo_content green "---> 卸载TrojanGo+Caddy+Web+TLS+Websocket节点 数据库版"
 
-    docker rm -f trojan-panel-trojanGO && \
-    docker rmi p4gefau1t/trojan-go && \
-    rm -f ${TROJANGO_CONFIG}
+    docker rm -f trojan-panel-trojanGO &&
+      docker rmi -f p4gefau1t/trojan-go &&
+      rm -f ${TROJANGO_CONFIG}
 
     echo_content skyBlue "---> TrojanGo+Caddy+Web+TLS+Websocket节点 数据库版卸载完成"
   else
@@ -1595,9 +1591,9 @@ uninstall_trojanGO_standalone() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel-trojanGO-standalone$") ]]; then
     echo_content green "---> 卸载TrojanGo+Caddy+Web+TLS+Websocket节点 单机版"
 
-    docker rm -f trojan-panel-trojanGO-standalone && \
-    docker rmi p4gefau1t/trojan-go && \
-    rm -f ${TROJANGO_STANDALONE_CONFIG}
+    docker rm -f trojan-panel-trojanGO-standalone &&
+      docker rmi -f p4gefau1t/trojan-go &&
+      rm -f ${TROJANGO_STANDALONE_CONFIG}
 
     echo_content skyBlue "---> TrojanGo+Caddy+Web+TLS+Websocket节点 单机版卸载完成"
   else
@@ -1609,9 +1605,9 @@ uninstall_hysteria() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel-hysteria") ]]; then
     echo_content green "---> 卸载Hysteria节点 数据库版"
 
-    docker rm -f trojan-panel-hysteria && \
-    docker rmi tobyxdd/hysteria && \
-    rm -f ${HYSTERIA_CONFIG}
+    docker rm -f trojan-panel-hysteria &&
+      docker rmi -f tobyxdd/hysteria &&
+      rm -f ${HYSTERIA_CONFIG}
 
     echo_content skyBlue "---> Hysteria节点 数据库版卸载完成"
   else
@@ -1623,14 +1619,24 @@ uninstall_hysteria_standalone() {
   if [[ -n $(docker ps -q -f "name=^trojan-panel-hysteria-standalone$") ]]; then
     echo_content green "---> 卸载Hysteria节点 单机版"
 
-    docker rm -f trojan-panel-hysteria-standalone && \
-    docker rmi tobyxdd/hysteria && \
-    rm -f ${HYSTERIA_STANDALONE_CONFIG}
+    docker rm -f trojan-panel-hysteria-standalone &&
+      docker rmi -f tobyxdd/hysteria &&
+      rm -f ${HYSTERIA_STANDALONE_CONFIG}
 
     echo_content skyBlue "---> Hysteria节点 单机版卸载完成"
   else
     echo_content red "---> 请先安装Hysteria节点 单机版"
   fi
+}
+
+uninstall_all() {
+  echo_content green "---> 卸载全部Trojan Panel相关的容器"
+
+  docker rm -f "$(docker ps -q -f "name=^trojan-panel")" &&
+    docker rmi -f "$(docker images | grep "^trojan-panel" | awk '{print $3}')" &&
+    rm -rf ${TP_DATA}
+
+  echo_content skyBlue "---> 卸载全部Trojan Panel相关的容器完成"
 }
 
 failure_testing() {
@@ -1679,9 +1685,9 @@ failure_testing() {
 # 卸载阿里云内置相关监控
 uninstall_aliyun() {
   # 卸载云监控(Cloudmonitor) Java 版
-  /usr/local/cloudmonitor/wrapper/bin/cloudmonitor.sh stop && \
-  /usr/local/cloudmonitor/wrapper/bin/cloudmonitor.sh remove && \
-  rm -rf /usr/local/cloudmonitor
+  /usr/local/cloudmonitor/wrapper/bin/cloudmonitor.sh stop &&
+    /usr/local/cloudmonitor/wrapper/bin/cloudmonitor.sh remove &&
+    rm -rf /usr/local/cloudmonitor
   # 卸载云盾(安骑士)
   wget --no-check-certificate -O uninstall.sh http://update.aegis.aliyun.com/download/uninstall.sh && chmod +x uninstall.sh && ./uninstall.sh
   wget --no-check-certificate -O quartz_uninstall.sh http://update.aegis.aliyun.com/download/quartz_uninstall.sh && chmod +x quartz_uninstall.sh && ./quartz_uninstall.sh
@@ -1735,8 +1741,9 @@ main() {
   echo_content yellow "14. 卸载Caddy TLS"
   echo_content yellow "15. 卸载MariaDB"
   echo_content yellow "16. 卸载Redis"
+  echo_content yellow "17. 卸载全部Trojan Panel相关的容器"
   echo_content green "\n=============================================================="
-  echo_content yellow "17. 故障检测"
+  echo_content yellow "18. 故障检测"
   read -r -p "请选择:" selectInstall_type
   case ${selectInstall_type} in
   1)
@@ -1800,6 +1807,9 @@ main() {
     uninstall_redis
     ;;
   17)
+    uninstall_all
+    ;;
+  18)
     failure_testing
     ;;
   *)
